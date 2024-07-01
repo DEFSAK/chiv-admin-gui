@@ -28,10 +28,10 @@ const DEBUG_DATA = {
         created_at: '2022-10-16T10:54:19.909Z',
         platform: 'GamePass',
         trust_info: {
-          is_admin: false,
-          is_veteran: false,
+          is_admin: true,
+          is_veteran: true,
           is_banned: false,
-          is_suspicious: false,
+          is_suspicious: true,
           is_new_to_db: false,
           was_banned: true,
           ban_charges: ['charge1', 'charge2', 'charge3'],

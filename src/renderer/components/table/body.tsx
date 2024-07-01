@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import { useState } from 'react';
+import Badges from './badges';
 
 interface RefreshFunction {
   playfab_id: string;
@@ -108,7 +109,10 @@ function Body({
                 />
                 <span className="checkbox-icon" />
               </label>
-              {item.display_name}
+              <div className="display-name-container">
+                {item.display_name}
+                <Badges trustInfo={item.trust_info} />
+              </div>
             </div>
             <div
               className={`col playfab-body ${
@@ -196,20 +200,8 @@ function Body({
                   <td />
                 </tr>
                 <tr>
-                  <td>Is Admin</td>
-                  <td>{item.trust_info.is_admin ? 'Yes' : 'No'}</td>
-                </tr>
-                <tr>
-                  <td>Is Veteran</td>
-                  <td>{item.trust_info.is_veteran ? 'Yes' : 'No'}</td>
-                </tr>
-                <tr>
                   <td>Is Banned</td>
                   <td>{item.trust_info.is_banned ? 'Yes' : 'No'}</td>
-                </tr>
-                <tr>
-                  <td>Is Suspicious</td>
-                  <td>{item.trust_info.is_suspicious ? 'Yes' : 'No'}</td>
                 </tr>
                 <tr>
                   <td>Is New to DB</td>
