@@ -23,7 +23,8 @@ export type Channels =
   | 'auth-user'
   | 'auth-user-success'
   | 'auth-user-fail'
-  | 'first-run';
+  | 'first-run'
+  | 'set-webhook';
 
 export interface Args {
   command?: string;
@@ -39,6 +40,7 @@ export interface Args {
   toast?: Id;
   TokenData?: any;
   token?: string;
+  webhook?: string;
 }
 
 const electronHandler = {

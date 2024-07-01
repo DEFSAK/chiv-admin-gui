@@ -88,4 +88,6 @@ export default (ipc_main: IpcMain, main_window: BrowserWindow) => {
 
     event.reply('refresh-token-success', token_data);
   });
+
+  return login;
 };

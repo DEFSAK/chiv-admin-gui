@@ -3,6 +3,10 @@ import settings from 'electron-settings';
 import { MessageBuilder, Webhook } from 'minimal-discord-webhook-node';
 
 export default (ipc_main: IpcMain) => {
+  ipc_main.on('set-webhook', (_, data) => {
+    settings.setSync('webhook', data.webhook);
+  });
+
   ipc_main.on('webhook', async (_, data) => {
     const username = settings.getSync('username');
 

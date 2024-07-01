@@ -69,12 +69,7 @@ const create_window = () => {
 
   main_window.loadURL(resolveHtmlPath('index.html'));
 
-  // Make this a user-configurable setting later
-  settings.setSync(
-    'webhook',
-    'https://discord.com/api/webhooks/1250840582125916233/oh5Td6i1PwSMCP8NB4hdCC1GjUHeLHmcRSCXGS3DlsIPbKGIwVbeXejJpGzQnPD9VLRm',
-  );
-
+  // Enforce required settings
   const settings_keys = ['username', 'console', 'token'];
   settings_keys.forEach((key) => {
     if (!settings.has(key)) {
@@ -98,17 +93,19 @@ const create_window = () => {
     main_window = null;
   });
 
+  const auth_login = auth_controller(ipcMain, main_window);
+
   if (first_run) {
     main_window.webContents.on('did-finish-load', () => {
       main_window!.webContents.send('first-run');
+      auth_login(main_window!);
     });
   }
 
-  auth_controller(ipcMain, main_window);
   command_ipc(ipcMain, main_window);
   settings_ipc(ipcMain);
   webhook_ipc(ipcMain);
-  token_ipc(ipcMain);
+  token_ipc(ipcMain, main_window!, auth_login);
 };
 
 app.on('window-all-closed', () => {

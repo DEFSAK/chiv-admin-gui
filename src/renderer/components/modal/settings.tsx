@@ -3,6 +3,7 @@
 import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
 import { IGlobalKeyEvent } from 'node-global-key-listener';
+import axios from 'axios';
 
 import '../../css/modal/settings.css';
 
@@ -13,6 +14,8 @@ interface SettingsProps {
   setConsoleKey: (value: IGlobalKeyEvent) => void;
   keyActive: boolean;
   setKeyActive: (value: boolean) => void;
+  webhook: string;
+  setWebhook: (value: string) => void;
 }
 
 function Tab1Content({
@@ -22,6 +25,8 @@ function Tab1Content({
   setConsoleKey,
   keyActive,
   setKeyActive,
+  webhook,
+  setWebhook,
 }: SettingsProps) {
   useEffect(() => {
     window.electron.ipcRenderer.sendMessage('get-settings');
@@ -53,7 +58,7 @@ function Tab1Content({
     });
   };
 
-  const handleSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handle_username_submit = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const Element = e.currentTarget as HTMLInputElement;
 
     if (e.key === 'Enter' && !keyActive) {
@@ -72,6 +77,41 @@ function Tab1Content({
     }
   };
 
+  const handle_webhook_submit = async (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    const Element = e.currentTarget as HTMLInputElement;
+
+    if (e.key === 'Enter' && !keyActive) {
+      Element.classList.add('loading');
+      const toastID = toast.loading('Testing webhook URL...');
+
+      try {
+        const result = await axios.get(Element.value);
+
+        if (result.data.name) {
+          toast.update(toastID, {
+            render: 'Webhook URL saved!',
+            type: 'success',
+            isLoading: false,
+            autoClose: 1000,
+            pauseOnHover: true,
+            closeOnClick: true,
+          });
+
+          window.electron.ipcRenderer.sendMessage('set-webhook', {
+            webhook: Element.value,
+          });
+        }
+      } catch (error: any) {
+        toast.error('Invalid webhook URL.');
+        console.log(error);
+      }
+
+      setKeyActive(true);
+    }
+  };
+
   return (
     <div className="modal-settings-page">
       <input
@@ -80,7 +120,21 @@ function Tab1Content({
         className="modal-settings-username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={handleSubmit}
+        onKeyDown={handle_username_submit}
+        onKeyUp={(e) => {
+          if (e.key === 'Enter') {
+            e.currentTarget.classList.remove('loading');
+            setKeyActive(false);
+          }
+        }}
+      />
+      <input
+        type="text"
+        placeholder="Change Webhook URL (Optional)"
+        className="modal-settings-username"
+        value={webhook}
+        onChange={(e) => setWebhook(e.target.value)}
+        onKeyDown={handle_webhook_submit}
         onKeyUp={(e) => {
           if (e.key === 'Enter') {
             e.currentTarget.classList.remove('loading');
@@ -133,6 +187,7 @@ function SettingsModal({
   const [username, setUsername] = useState<string>('');
   const [consoleKey, setConsoleKey] = useState<IGlobalKeyEvent>();
   const [keyActive, setKeyActive] = useState(false);
+  const [webhook, setWebhook] = useState<string>('');
 
   // eslint-disable-next-line consistent-return
   useEffect(() => {
@@ -217,6 +272,8 @@ function SettingsModal({
               setConsoleKey={setConsoleKey}
               keyActive={keyActive}
               setKeyActive={setKeyActive}
+              webhook={webhook}
+              setWebhook={setWebhook}
             />
           ) : (
             <Tab2Content />

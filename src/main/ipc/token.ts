@@ -1,4 +1,4 @@
-import { safeStorage, type IpcMain } from 'electron';
+import { safeStorage, type IpcMain, type BrowserWindow } from 'electron';
 import settings from 'electron-settings';
 
 interface AuthToken {
@@ -15,7 +15,11 @@ const parseISOString = (ISOString: string) => {
   // eslint-disable-next-line no-plusplus
   return new Date(Date.UTC(N[0], --N[1], N[2], N[3], N[4], N[5], N[6]));
 };
-export default (ipc_main: IpcMain) => {
+export default (
+  ipc_main: IpcMain,
+  main_window: BrowserWindow,
+  login: (main_window: BrowserWindow) => void,
+) => {
   ipc_main.on('encrypt-token', async (_, args) => {
     const { TokenData } = args;
     const AccessToken = TokenData.token.access_token;
@@ -52,6 +56,7 @@ export default (ipc_main: IpcMain) => {
         error: 'Token not found',
         token: null,
       });
+      login(main_window);
       return;
     }
 
@@ -64,6 +69,7 @@ export default (ipc_main: IpcMain) => {
         error: 'Token expired',
         token: null,
       });
+      login(main_window);
       return;
     }
 
