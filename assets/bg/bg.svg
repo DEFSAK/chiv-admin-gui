@@ -1,0 +1,43 @@
+<svg width="728" height="568" viewBox="0 0 728 568" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g clip-path="url(#clip0_5_357)">
+<rect width="728" height="568" fill="#121212"/>
+<rect width="728" height="568" fill="url(#paint0_linear_5_357)" fill-opacity="0.5"/>
+<g filter="url(#filter0_f_5_357)">
+<rect x="396" y="436" width="256" height="256" rx="128" fill="#4A72FF" fill-opacity="0.42"/>
+</g>
+<g filter="url(#filter1_f_5_357)">
+<rect x="-58" y="502" width="256" height="256" rx="128" fill="#9D1D1D" fill-opacity="0.31"/>
+</g>
+<g filter="url(#filter2_f_5_357)">
+<rect x="84" y="45" width="256" height="256" rx="128" fill="#4A72FF" fill-opacity="0.42"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_5_357" x="140" y="180" width="768" height="768" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="128" result="effect1_foregroundBlur_5_357"/>
+</filter>
+<filter id="filter1_f_5_357" x="-314" y="246" width="768" height="768" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="128" result="effect1_foregroundBlur_5_357"/>
+</filter>
+<filter id="filter2_f_5_357" x="-172" y="-211" width="768" height="768" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="128" result="effect1_foregroundBlur_5_357"/>
+</filter>
+<pattern id="pattern0_5_357" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_5_357" transform="scale(0.2 0.142857)"/>
+</pattern>
+<linearGradient id="paint0_linear_5_357" x1="364" y1="0" x2="364" y2="568" gradientUnits="userSpaceOnUse">
+<stop stop-opacity="0"/>
+<stop offset="1" stop-color="#082673"/>
+</linearGradient>
+<clipPath id="clip0_5_357">
+<rect width="728" height="568" fill="white"/>
+</clipPath>
+<image id="image0_5_357" width="5" height="7" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAHCAYAAADAp4fuAAAAGklEQVQYGWOQV7L6j44Z0AVAfLoIMrMI/QcApywzTab58noAAAAASUVORK5CYII="/>
+</defs>
+</svg>
