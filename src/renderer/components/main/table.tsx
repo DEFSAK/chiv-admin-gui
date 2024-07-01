@@ -109,6 +109,8 @@ function GlassTable({ data, reason, duration }: TableData) {
   }, [checkedItems, filteredData]);
 
   const handle_ban = (playerId: string) => {
+    const ban_duration = Number.isNaN(duration) ? 1 : duration;
+
     const selectedIds = Object.entries(checkedItems)
       .filter(([_, value]) => value)
       .map(([key]) => key);
@@ -120,8 +122,9 @@ function GlassTable({ data, reason, duration }: TableData) {
         const item = data.find((ditem) => ditem.playfab_id === id);
         run_command(
           'BanById',
-          `${item?.playfab_id} ${duration} "${
-            reason || `Banned for ${duration} hour${duration > 1 ? 's' : ''}`
+          `${item?.playfab_id} ${ban_duration} "${
+            reason ||
+            `Banned for ${ban_duration} hour${ban_duration > 1 ? 's' : ''}`
           }"`,
           toastID,
         );
@@ -130,8 +133,9 @@ function GlassTable({ data, reason, duration }: TableData) {
       const toastID = toast.loading('Running command...');
       run_command(
         'BanById',
-        `${playerId} ${duration} "${
-          reason || `Banned for ${duration} hour${duration > 1 ? 's' : ''}`
+        `${playerId} ${ban_duration} "${
+          reason ||
+          `Banned for ${ban_duration} hour${ban_duration > 1 ? 's' : ''}`
         }"`,
         toastID,
       );

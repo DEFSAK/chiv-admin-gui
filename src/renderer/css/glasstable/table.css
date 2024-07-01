@@ -183,6 +183,13 @@
   background-color: rgba(48, 48, 48, 0.25);
 }
 
+.kick-icon {
+  position: absolute;
+  top: 48%;
+  left: 54%;
+  transform: translate(-45%, -45%);
+}
+
 .ban-icon {
   position: absolute;
   top: 50%;
