@@ -2,6 +2,8 @@ import MessageButton from '../buttons/message';
 import SettingsButton from '../buttons/settings';
 import UnbanButton from '../buttons/unban';
 
+import '../../css/glasstable/extra.css';
+
 type GlassTableMiscProps = {
   onOpenModal: () => void;
 };

@@ -20,7 +20,7 @@ function Message() {
         command: `${commandName} "${InputRef.current?.value}"`,
       });
 
-      window.electron.ipcRenderer.once('commandResponse', (args) => {
+      window.electron.ipcRenderer.once('command-response', (args) => {
         if (args.error) {
           toast.update(id, {
             render: args.error,

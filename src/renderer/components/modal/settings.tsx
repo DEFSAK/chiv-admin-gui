@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
 import { IGlobalKeyEvent } from 'node-global-key-listener';
 
+import '../../css/modal/settings.css';
+
 interface SettingsProps {
   username: string;
   setUsername: (value: string) => void;
@@ -22,8 +24,8 @@ function Tab1Content({
   setKeyActive,
 }: SettingsProps) {
   useEffect(() => {
-    window.electron.ipcRenderer.sendMessage('getSettings');
-    window.electron.ipcRenderer.once('settingsResponse', (settings) => {
+    window.electron.ipcRenderer.sendMessage('get-settings');
+    window.electron.ipcRenderer.once('get-settings-response', (settings) => {
       setUsername(settings.username as string);
       setConsoleKey(settings.consoleKey as IGlobalKeyEvent);
     });
@@ -35,8 +37,8 @@ function Tab1Content({
 
     const id = toast.loading('Press your console key...');
 
-    window.electron.ipcRenderer.sendMessage('setConsoleKey');
-    window.electron.ipcRenderer.once('setConsoleKeyResponse', (args) => {
+    window.electron.ipcRenderer.sendMessage('set-console-key');
+    window.electron.ipcRenderer.once('set-console-key-response', (args) => {
       setConsoleKey(args.consoleKey as IGlobalKeyEvent);
       toast.update(id, {
         render: 'Console key updated successfully!',
@@ -60,7 +62,7 @@ function Tab1Content({
       if (Element.value.length < 3) {
         toast.error('Username must be at least 3 characters long.');
       } else {
-        window.electron.ipcRenderer.sendMessage('setUsername', {
+        window.electron.ipcRenderer.sendMessage('set-username', {
           username: Element.value,
         });
         toast.success('Username updated successfully!');

@@ -1,0 +1,85 @@
+.ptcb {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ptcb #ptcb-left,
+.ptcb #ptcb-right {
+  display: flex;
+  align-items: center;
+}
+
+.ptcb #ptcb-left p {
+  color: #fff;
+  font-size: 16pt;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.ptcb #ptcb-right #ptcb-duration,
+.ptcb #ptcb-right #ptcb-reason {
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  padding-left: 16px;
+  height: 32px;
+  font-size: 12pt;
+  color: #fff;
+}
+
+.ptcb #ptcb-right #ptcb-reason {
+  width: 160px;
+  max-width: calc(160px - 16px);
+}
+
+.ptcb #ptcb-right #ptcb-duration {
+  max-width: calc(98px - 16px);
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+#preset-button {
+  /* Removed ,.ban-button,.kick-button */
+  line-height: 0;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+#preset-button {
+  background-color: rgba(20, 29, 62, 0.25);
+  border: 1px solid #4265e0;
+  border-radius: 4px;
+  color: #fff;
+  --preset-icon-hover: #4a72ff;
+}
+
+#preset-button:hover {
+  --preset-icon-hover: white;
+  background-color: #4265e0;
+}
+
+#preset-icon path {
+  fill: var(--preset-icon-hover);
+}
+
+#refresh-button {
+  width: 32px;
+  height: 32px;
+  background-color: rgba(18, 56, 22, 0.25);
+  border: 1px solid #298231;
+  border-radius: 4px;
+  color: #fff;
+  line-height: 0;
+  cursor: pointer;
+  --refresh-button-hover: #67d172;
+}
+
+#refresh-button:hover {
+  --refresh-button-hover: white;
+  background-color: #298231;
+}
+
+#refresh-icon path {
+  stroke: var(--refresh-button-hover);
+}

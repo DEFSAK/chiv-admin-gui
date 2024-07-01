@@ -24,26 +24,6 @@ export type Channels =
   | 'auth-user-success'
   | 'auth-user-fail'
   | 'first-run';
-// | 'setupComplete'
-// | 'command'
-// | 'commandResponse'
-// | 'openSettings'
-// | 'discord'
-// | 'setConsoleKey'
-// | 'setConsoleKeyResponse'
-// | 'setUsername'
-// | 'getSettings'
-// | 'settingsResponse'
-// | 'firstRun'
-// | 'authenticate_user'
-// | 'oauth-fail'
-// | 'oauth-success'
-// | 'token-refresh'
-// | 'token-refresh-success'
-// | 'token-refresh-fail'
-// | 'encrypt-token'
-// | 'get-refresh-token'
-// | 'get-refresh-token-response';
 
 export interface Args {
   command?: string;

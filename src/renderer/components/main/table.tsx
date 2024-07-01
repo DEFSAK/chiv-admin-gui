@@ -3,6 +3,8 @@ import { toast, type Id } from 'react-toastify';
 import GlassTableBody from '../table/body';
 import GlassTableHeader from '../table/header';
 
+import '../../css/glasstable/table.css';
+
 export interface RefreshFunction {
   playfab_id: string;
   display_name: string;

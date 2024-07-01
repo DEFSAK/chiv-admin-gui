@@ -1,0 +1,240 @@
+@keyframes height-out {
+  0% {
+    max-height: 100px;
+  }
+
+  to {
+    max-height: 0;
+  }
+}
+
+@keyframes height-in {
+  0% {
+    max-height: 0;
+  }
+
+  to {
+    max-height: 100px;
+  }
+}
+
+.pt,
+.pt-header {
+  display: flex;
+  text-align: center;
+}
+
+.pt {
+  width: 100%;
+  max-height: 270px;
+  overflow-y: hidden;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  flex-direction: column;
+}
+
+.pt-header {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+#header-search {
+  width: 128px;
+  max-width: calc(128px - 16px);
+  margin-left: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  padding: 4px 4px 4px 16px;
+}
+
+.pt-name,
+.row-content {
+  display: flex;
+  align-items: center;
+}
+
+.custom-checkbox,
+.pt-checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.pt-checkbox:checked {
+  background-color: #4a72ff;
+}
+
+.pt-checkbox:disabled {
+  border: #303030 2px solid;
+}
+
+.custom-checkbox input[type='checkbox'] {
+  display: none;
+}
+
+.custom-checkbox .checkbox-icon {
+  display: inline-block;
+  position: relative;
+  padding: 0;
+  width: 14px;
+  height: 14px;
+  border: #4a72ff 2px solid;
+  border-radius: 4px;
+  margin: 0 24px 0 4px;
+  cursor: pointer;
+}
+
+.custom-checkbox .checkbox-icon::after {
+  content: '';
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.4375 2.8125L4.0625 7.1875L1.875 5' stroke='white' strokeWidth='1.53' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform: translate(-50%, -50%);
+}
+
+.custom-checkbox input[type='checkbox']:checked + .checkbox-icon::after {
+  background-color: #4a72ff;
+  border: 2px solid #4a72ff;
+  border-radius: 4px;
+  display: block;
+}
+
+#header-search,
+.pt-additional-content {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+
+.playfab,
+.playfab-body {
+  width: 40%;
+  text-align: left;
+}
+
+.actions,
+.actions-header {
+  width: 12%;
+}
+
+.pt-body {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.pt-item {
+  cursor: pointer;
+}
+
+.row-content {
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 8px 16px;
+  color: #bfbfbf;
+}
+
+.pt-name {
+  width: 55%;
+}
+
+.actions button {
+  margin-left: 5px;
+  width: 28px;
+  height: 28px;
+  background-color: rgba(54, 10, 10, 0.25);
+  border: 1px solid #6b1919;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ban-button,
+.kick-button {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  --action-icon-hover: #d16767;
+}
+
+.ban-button:disabled,
+.kick-button:disabled {
+  border-color: #303030;
+  background-color: rgba(48, 48, 48, 0.25);
+}
+
+.ban-button:disabled .ban-icon path,
+.kick-button:disabled .kick-icon path {
+  fill: rgba(48, 48, 48, 0.5);
+}
+
+.ban-button:disabled:hover,
+.kick-button:disabled:hover {
+  background-color: rgba(48, 48, 48, 0.25);
+}
+
+.ban-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-45%, -45%);
+}
+
+.ban-button:hover,
+.kick-button:hover {
+  --action-icon-hover: white;
+  background-color: #6b1919;
+}
+
+.ban-icon path,
+.kick-icon path {
+  fill: var(--action-icon-hover);
+}
+
+.pt-additional-content {
+  overflow: auto;
+  overflow-x: hidden;
+  text-align: left;
+  line-height: 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.pt-additional-content.show {
+  animation: height-in 250ms ease-in forwards;
+}
+
+.pt-additional-content.hide {
+  animation: height-out 250ms ease-in forwards;
+}
+
+.pt-additional-content table,
+.pt-additional-content table tr {
+  width: 100%;
+}
+
+.pt-additional-content table tr td:first-child {
+  padding-left: 59px;
+  width: 50%;
+}
+
+.pt-additional-content table tr td:nth-child(2) {
+  width: 47.5%;
+}
+
+.ptac-t-divider {
+  width: 100%;
+  height: 1px !important;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 8px !important;
+}

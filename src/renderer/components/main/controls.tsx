@@ -2,6 +2,8 @@ import { type RefreshFunction } from './table';
 import RefreshButton from '../buttons/refresh';
 import BanInfo from '../buttons/banInfo';
 
+import '../../css/glasstable/controls.css';
+
 export type GlassTableControlsProps = {
   onRefresh: (parsedData: RefreshFunction[]) => void;
   reason: string;
