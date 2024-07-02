@@ -72,7 +72,7 @@ const create_window = () => {
   // Enforce required settings
   const settings_keys = ['username', 'console', 'token'];
   settings_keys.forEach((key) => {
-    if (!settings.has(key)) {
+    if (!settings.hasSync(key)) {
       first_run = true;
     }
   });
@@ -98,7 +98,7 @@ const create_window = () => {
   if (first_run) {
     main_window.webContents.on('did-finish-load', () => {
       main_window!.webContents.send('first-run');
-      auth_login(main_window!);
+      auth_login();
     });
   }
 

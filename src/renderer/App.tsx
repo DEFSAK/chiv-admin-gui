@@ -8,6 +8,18 @@ import GlassTable, { type RefreshFunction } from './components/main/table';
 import GlassTableControls from './components/main/controls';
 import GlassTableMisc from './components/main/extra';
 
+window.electron.ipcRenderer.on('auth-user-success', (TokenData) => {
+  console.log('OAuth Success', TokenData);
+
+  window.electron.ipcRenderer.sendMessage('encrypt-token', {
+    TokenData,
+  });
+});
+
+window.electron.ipcRenderer.on('auth-user-fail', (error) => {
+  console.log('OAuth Fail:', error);
+});
+
 function Home() {
   const [refreshData, setRefreshData] = useState({});
   const [reason, setReason] = useState('');
@@ -63,61 +75,6 @@ function Home() {
         firstRun={firstRun}
         setFirstRun={setFirstRun}
       />
-      <div>
-        <button
-          type="button"
-          onClick={() => {
-            window.electron.ipcRenderer.sendMessage('auth-user');
-            window.electron.ipcRenderer.on('auth-user-success', (TokenData) => {
-              console.log(`OAuth Success: ${TokenData}`);
-              console.log('User authenticated');
-
-              window.electron.ipcRenderer.sendMessage('encrypt-token', {
-                TokenData,
-              });
-            });
-            window.electron.ipcRenderer.on('auth-user-fail', (error) => {
-              console.log(`OAuth Fail: ${error}`);
-              console.log('User not authenticated');
-            });
-          }}
-        >
-          Login Test
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            window.electron.ipcRenderer.sendMessage('get-refresh-token');
-            window.electron.ipcRenderer.on(
-              'get-refresh-token-response',
-              (args) => {
-                if (!args.token) {
-                  console.error(args.error);
-                  return;
-                }
-
-                window.electron.ipcRenderer.sendMessage('refresh-token', {
-                  token: args.token,
-                });
-              },
-            );
-
-            window.electron.ipcRenderer.on(
-              'refresh-token-success',
-              (TokenData) => {
-                console.log(`Token Refresh Success: ${TokenData}`);
-                console.log('Token refreshed');
-              },
-            );
-            window.electron.ipcRenderer.on('refresh-token-fail', (args) => {
-              console.log(`Token Refresh Fail: ${args.error?.message}`);
-              console.log(args.error);
-            });
-          }}
-        >
-          Token Refresh Test
-        </button>
-      </div>
     </div>
   );
 }
