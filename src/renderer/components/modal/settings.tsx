@@ -91,27 +91,35 @@ function Tab1Content({
       Element.classList.add('loading');
       const toastID = toast.loading('Testing webhook URL...');
 
-      try {
-        const result = await axios.get(Element.value);
+      if (Element.value.length > 0) {
+        try {
+          const result = await axios.get(Element.value);
 
-        if (result.data.name) {
+          if (result.data.name) {
+            toast.update(toastID, {
+              render: 'Webhook URL saved!',
+              type: 'success',
+              ...toast_settings,
+            });
+
+            window.electron.ipcRenderer.sendMessage('set-webhook', {
+              webhook: Element.value,
+            });
+          }
+        } catch (error: any) {
           toast.update(toastID, {
-            render: 'Webhook URL saved!',
-            type: 'success',
+            render: 'Invalid webhook URL!',
+            type: 'error',
             ...toast_settings,
           });
-
-          window.electron.ipcRenderer.sendMessage('set-webhook', {
-            webhook: Element.value,
-          });
+          console.log(error);
         }
-      } catch (error: any) {
+      } else {
         toast.update(toastID, {
           render: 'Invalid webhook URL!',
           type: 'error',
           ...toast_settings,
         });
-        console.log(error);
       }
 
       setKeyActive(true);
