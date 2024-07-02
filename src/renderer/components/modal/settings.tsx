@@ -18,6 +18,13 @@ interface SettingsProps {
   setWebhook: (value: string) => void;
 }
 
+const toast_settings = {
+  isLoading: false,
+  autoClose: 1000,
+  pauseOnHover: true,
+  closeOnClick: true,
+};
+
 function Tab1Content({
   username,
   setUsername,
@@ -33,8 +40,9 @@ function Tab1Content({
     window.electron.ipcRenderer.once('get-settings-response', (settings) => {
       setUsername(settings.username as string);
       setConsoleKey(settings.consoleKey as IGlobalKeyEvent);
+      setWebhook(settings.webhook as string);
     });
-  }, [setConsoleKey, setUsername]);
+  }, [setConsoleKey, setUsername, setWebhook]);
 
   const handleConsoleKey = (e: React.MouseEvent<HTMLButtonElement>) => {
     const Element = e.currentTarget;
@@ -48,10 +56,7 @@ function Tab1Content({
       toast.update(id, {
         render: 'Console key updated successfully!',
         type: 'success',
-        isLoading: false,
-        autoClose: 1000,
-        pauseOnHover: true,
-        closeOnClick: true,
+        ...toast_settings,
       });
 
       Element.disabled = false;
@@ -93,10 +98,7 @@ function Tab1Content({
           toast.update(toastID, {
             render: 'Webhook URL saved!',
             type: 'success',
-            isLoading: false,
-            autoClose: 1000,
-            pauseOnHover: true,
-            closeOnClick: true,
+            ...toast_settings,
           });
 
           window.electron.ipcRenderer.sendMessage('set-webhook', {
@@ -104,7 +106,11 @@ function Tab1Content({
           });
         }
       } catch (error: any) {
-        toast.error('Invalid webhook URL.');
+        toast.update(toastID, {
+          render: 'Invalid webhook URL!',
+          type: 'error',
+          ...toast_settings,
+        });
         console.log(error);
       }
 
