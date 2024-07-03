@@ -77,3 +77,31 @@ export const refresh_token = async (token: string) => {
     return null;
   }
 };
+
+export const get_validated_players = async (
+  token: string,
+  players: Record<string, string>[],
+) => {
+  const response = await axios.post(
+    'https://apim-chivvy.azure-api.net/rpc',
+    {
+      jsonrpc: '2.0',
+      method: 'Validator.Validate',
+      params: {
+        players,
+      },
+      id: 1,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (response.data && response.data.result.validated_players) {
+    return response.data.result.validated_players;
+  }
+
+  return null;
+};

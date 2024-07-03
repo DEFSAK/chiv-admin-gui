@@ -49,8 +49,8 @@ declare class Game {
 }
 
 const fetch_game_process = (): Game | null => {
-  // const game = new Hardware('Chivalry 2  ', 'UnrealWindow') as Game;
-  const game = new Hardware(null, 'Notepad') as Game;
+  const game = new Hardware('Chivalry 2  ', 'UnrealWindow') as Game;
+  // const game = new Hardware(null, 'Notepad') as Game;
   if (!game.workwindow.isOpen()) return null;
   return game;
 };

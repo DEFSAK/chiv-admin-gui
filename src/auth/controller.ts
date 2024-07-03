@@ -1,7 +1,12 @@
 import Express from 'express';
 import type { Server } from 'http';
 import { BrowserWindow, type IpcMain } from 'electron';
-import { auth_code, get_login_url, refresh_token } from './auth';
+import {
+  auth_code,
+  get_login_url,
+  refresh_token,
+  get_validated_players,
+} from './auth';
 import { redirect_uri, client_id } from './config.json';
 
 let auth_window: BrowserWindow | null;
@@ -87,6 +92,20 @@ export default (ipc_main: IpcMain, main_window: BrowserWindow) => {
     }
 
     event.reply('refresh-token-success', token_data);
+  });
+
+  ipc_main.on('get-players', async (event, args) => {
+    const players = await get_validated_players(args.token, args.players);
+
+    if (!players) {
+      event.reply('get-players-response', {
+        error: 'Failed to get players.',
+        players: null,
+      });
+      return;
+    }
+
+    event.reply('get-players-response', { error: null, players });
   });
 
   return create_window;

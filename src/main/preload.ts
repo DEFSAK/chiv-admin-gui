@@ -19,12 +19,16 @@ export type Channels =
   | 'refresh-token-fail'
   | 'get-refresh-token'
   | 'get-refresh-token-response'
+  | 'get-access-token'
+  | 'get-access-token-response'
   | 'webhook'
   | 'auth-user'
   | 'auth-user-success'
   | 'auth-user-fail'
   | 'first-run'
-  | 'set-webhook';
+  | 'set-webhook'
+  | 'get-players'
+  | 'get-players-response';
 
 export interface Args {
   command?: string;
@@ -41,6 +45,7 @@ export interface Args {
   TokenData?: any;
   token?: string;
   webhook?: string;
+  players?: Record<string, string>[];
 }
 
 const electronHandler = {
