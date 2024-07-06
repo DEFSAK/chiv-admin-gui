@@ -77,7 +77,7 @@ const create_window = () => {
     }
   });
 
-  main_window.setMenuBarVisibility(true); // Hide this (Soon™)
+  main_window.setMenuBarVisibility(false);
 
   main_window.on('show', () => {
     if (!main_window) throw new Error('"main_window" is not defined');

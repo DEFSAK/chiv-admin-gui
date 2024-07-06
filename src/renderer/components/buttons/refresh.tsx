@@ -51,6 +51,7 @@ const get_players = (text: string, callback: (data: any) => void) => {
   window.electron.ipcRenderer.once('get-access-token-response', (args) => {
     if (args.error || !args.token) {
       console.error(args.error);
+      console.log('An error occurred while getting the access token.');
       return;
     }
 
@@ -116,21 +117,21 @@ function Refresh({ onRefresh }: RefreshProps) {
                 closeOnClick: true,
               });
             } else if (args.command === 'listplayers') {
-              toast.update(id, {
-                render: `Players refreshed!`,
-                type: 'success',
-                isLoading: false,
-                autoClose: 1000,
-                pauseOnHover: true,
-                closeOnClick: true,
-              });
-
               const clipboardContents = await fetchClipboardContents();
               // const { parsedData } = await parsePlayerData(clipboardContents);
 
               get_players(clipboardContents, (data: any) => {
                 setState({
                   dataLength: data.length,
+                });
+
+                toast.update(id, {
+                  render: `Players refreshed!`,
+                  type: 'success',
+                  isLoading: false,
+                  autoClose: 1000,
+                  pauseOnHover: true,
+                  closeOnClick: true,
                 });
 
                 onRefresh(data);
