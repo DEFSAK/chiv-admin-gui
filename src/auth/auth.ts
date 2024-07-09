@@ -1,5 +1,7 @@
 import { AuthorizationCode } from 'simple-oauth2';
 import axios from 'axios';
+import { app } from 'electron';
+import * as fs from 'fs';
 import { generate_code_challenge, generate_code_verifier } from './pkce';
 import {
   client_id,
@@ -73,7 +75,6 @@ export const refresh_token = async (token: string) => {
     return response.data;
   } catch (error: any) {
     console.error(error);
-
     return null;
   }
 };
@@ -98,6 +99,23 @@ export const get_validated_players = async (
       },
     },
   );
+
+  if (response) {
+    const userdata = app.getPath('userData');
+    const debug_path = `${userdata}/debug.json`;
+    const debug_data = JSON.stringify(
+      {
+        status: response.status,
+        headers: response.headers,
+        data: response.data,
+      },
+      null,
+      2,
+    );
+    fs.writeFileSync(debug_path, debug_data);
+
+    console.log(response);
+  }
 
   if (response.data && response.data.result.validated_players) {
     return response.data.result.validated_players;

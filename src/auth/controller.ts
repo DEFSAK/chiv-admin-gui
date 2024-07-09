@@ -94,18 +94,9 @@ export default (ipc_main: IpcMain, main_window: BrowserWindow) => {
     event.reply('refresh-token-success', token_data);
   });
 
-  ipc_main.on('get-players', async (event, args) => {
+  ipc_main.handle('get-players', async (_, args) => {
     const players = await get_validated_players(args.token, args.players);
-
-    if (!players) {
-      event.reply('get-players-response', {
-        error: 'Failed to get players.',
-        players: null,
-      });
-      return;
-    }
-
-    event.reply('get-players-response', { error: null, players });
+    return players || null;
   });
 
   return create_window;

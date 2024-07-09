@@ -46,6 +46,7 @@ export interface Args {
   token?: string;
   webhook?: string;
   players?: Record<string, string>[];
+  clipboard?: string;
 }
 
 const electronHandler = {
@@ -64,6 +65,9 @@ const electronHandler = {
     },
     once(channel: Channels, func: (...args: Args[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
+    },
+    invoke(channel: Channels, ...args: Args[]) {
+      return ipcRenderer.invoke(channel, ...args);
     },
   },
 };

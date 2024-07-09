@@ -59,6 +59,7 @@ const create_window = () => {
     minWidth: 800,
     height: 650,
     minHeight: 650,
+    title: 'Admin GooWee',
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -67,17 +68,18 @@ const create_window = () => {
     },
   });
 
+  main_window.setTitle('Admin GooWee');
   main_window.loadURL(resolveHtmlPath('index.html'));
 
   // Enforce required settings
-  const settings_keys = ['username', 'console', 'token'];
+  const settings_keys = ['username', 'console'];
   settings_keys.forEach((key) => {
     if (!settings.hasSync(key)) {
       first_run = true;
     }
   });
 
-  main_window.setMenuBarVisibility(false);
+  main_window.setMenuBarVisibility(true);
 
   main_window.on('show', () => {
     if (!main_window) throw new Error('"main_window" is not defined');

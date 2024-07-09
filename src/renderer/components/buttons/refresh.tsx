@@ -1,16 +1,14 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-const fetchClipboardContents = async () => {
-  try {
-    const clipboardContents = await navigator.clipboard.readText();
-    return clipboardContents;
-  } catch (error) {
-    return `Error reading clipboard contents: ${error}`;
-  }
-};
+const { ipcRenderer } = window.electron;
 
 const parsePlayerData = (text: string) => {
+  console.log('\n-----');
+  console.log('Parsing clipboard data...');
+  console.log(text);
+  console.log('-----\n');
+
   const lines = text.split('\n');
 
   const serverInfo = lines[0].replace('ServerName - ', '');
@@ -35,7 +33,17 @@ const parsePlayerData = (text: string) => {
     parsedData.push({ display_name: columns[0], playfab_id: columns[1] });
   });
 
+  console.log('\n-----');
+  console.log('Parsed data:');
+  console.log(parsedData);
+  console.log('-----\n');
+
   const filteredData = parsedData.filter((item) => item.playfab_id !== 'NULL');
+
+  console.log('\n-----');
+  console.log('Filtered parsed data:');
+  console.log(filteredData);
+  console.log('-----\n');
 
   return {
     serverName,
@@ -44,26 +52,47 @@ const parsePlayerData = (text: string) => {
   };
 };
 
-const get_players = (text: string, callback: (data: any) => void) => {
+const get_players = async (text: string, callback: (data: any) => void) => {
   const { parsedData } = parsePlayerData(text);
+  console.log('\n-----');
+  console.log('Parsed data passed to *get_players*:');
+  console.log(parsedData);
+  console.log('-----\n');
 
-  window.electron.ipcRenderer.sendMessage('get-access-token');
-  window.electron.ipcRenderer.once('get-access-token-response', (args) => {
-    if (args.error || !args.token) {
-      console.error(args.error);
-      console.log('An error occurred while getting the access token.');
-      return;
-    }
+  const access_token = await ipcRenderer.invoke('get-access-token');
 
-    window.electron.ipcRenderer.sendMessage('get-players', {
-      players: parsedData,
-      token: args.token,
-    });
+  console.log('\n-----');
+  console.log(
+    'Access token fetched from *ipc->get-access-token* in *get_players*:',
+  );
+  console.log(access_token);
+  console.log('-----\n');
 
-    window.electron.ipcRenderer.once('get-players-response', (data) => {
-      callback(data.players);
-    });
+  if (!access_token) {
+    console.log(
+      `There was an error getting the access token. (${access_token})`,
+    );
+
+    callback({ error: 'An error occurred while getting the access token.' });
+    return;
+  }
+
+  const players = await ipcRenderer.invoke('get-players', {
+    players: parsedData,
+    token: access_token,
   });
+
+  console.log('\n-----');
+  console.log('Players fetched from *ipc->get-players* in *get_players*:');
+  console.log(players);
+  console.log('-----\n');
+
+  if (players.length < 1) {
+    callback({ error: 'No players were found.' });
+    return;
+  }
+
+  callback(players);
 };
 
 interface RefreshFunction {
@@ -107,6 +136,7 @@ function Refresh({ onRefresh }: RefreshProps) {
             command: 'listplayers',
           });
           window.electron.ipcRenderer.once('command-response', async (args) => {
+            console.log(`Got response: ${args}`);
             if (args.error) {
               toast.update(id, {
                 render: args.error,
@@ -117,10 +147,36 @@ function Refresh({ onRefresh }: RefreshProps) {
                 closeOnClick: true,
               });
             } else if (args.command === 'listplayers') {
-              const clipboardContents = await fetchClipboardContents();
-              // const { parsedData } = await parsePlayerData(clipboardContents);
+              const clipboardContents = args.clipboard;
+              if (!clipboardContents || clipboardContents.length < 1) {
+                toast.update(id, {
+                  render: 'No clipboard data found',
+                  type: 'error',
+                  isLoading: false,
+                  autoClose: 1000,
+                  pauseOnHover: true,
+                  closeOnClick: true,
+                });
+
+                return;
+              }
 
               get_players(clipboardContents, (data: any) => {
+                console.log(data);
+                console.log(data.error);
+                if (data.error) {
+                  toast.update(id, {
+                    render: data.error,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 1000,
+                    pauseOnHover: true,
+                    closeOnClick: true,
+                  });
+
+                  return;
+                }
+
                 setState({
                   dataLength: data.length,
                 });

@@ -11,6 +11,7 @@ import {
   type Mouse,
   type Workwindow,
 } from 'keysender';
+import clipboardListener from 'clipboard-event';
 
 // Because the Worker class in keysender from worker.d.ts file is not exported, we have to redefine it, in this case as the Game class
 declare class Game {
@@ -98,13 +99,44 @@ const process_command_queue = async (main_window: BrowserWindow) => {
     return;
   }
 
+  if (args.commandName === 'listplayers') {
+    let has_changed = false;
+    clipboardListener.startListening();
+    clipboardListener.on('change', () => {
+      console.log('Clipboard changed');
+      const clip = clipboard.readText();
+      if (!clip.includes('listplayers')) {
+        has_changed = true;
+        event.reply('command-response', {
+          command: args.commandName,
+          clipboard: clip,
+          toast: args.toast,
+        });
+        clipboardListener.stopListening();
+      }
+    });
+
+    setTimeout(() => {
+      console.log(has_changed);
+      if (!has_changed) {
+        event.reply('command-response', {
+          command: args.commandName,
+          error: 'No response from game',
+        });
+        clipboardListener.stopListening();
+      }
+    }, 2000);
+  }
+
   await write_to_console(game, args.command);
   main_window.show();
 
-  event.reply('command-response', {
-    command: args.commandName,
-    toast: args.toast,
-  });
+  if (args.commandName !== 'listplayers') {
+    event.reply('command-response', {
+      command: args.commandName,
+      toast: args.toast,
+    });
+  }
 
   is_processing = false;
   process_command_queue(main_window);

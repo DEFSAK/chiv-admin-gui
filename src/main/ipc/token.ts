@@ -1,5 +1,5 @@
-import { safeStorage, type IpcMain, type BrowserWindow } from 'electron';
-import settings from 'electron-settings';
+import { app, safeStorage, type IpcMain, type BrowserWindow } from 'electron';
+import * as fs from 'fs';
 import { refresh_token } from '../../auth/auth';
 
 interface AuthToken {
@@ -16,14 +16,80 @@ const parseISOString = (ISOString: string) => {
   // eslint-disable-next-line no-plusplus
   return new Date(Date.UTC(N[0], --N[1], N[2], N[3], N[4], N[5], N[6]));
 };
+
 export default (
   ipc_main: IpcMain,
   main_window: BrowserWindow,
   login: (main_window: BrowserWindow) => void,
 ) => {
-  const encrypt_token = async (TokenData: any) => {
-    console.log(TokenData);
+  const userDataPath = app.getPath('userData');
+  const tokenPath = `${userDataPath}/token`;
 
+  if (!fs.existsSync(tokenPath)) {
+    fs.mkdirSync(tokenPath);
+  }
+
+  const refreshTokenPath = `${tokenPath}/r_token`;
+  const accessTokenPath = `${tokenPath}/a_token`;
+
+  if (!fs.existsSync(refreshTokenPath)) {
+    fs.writeFileSync(refreshTokenPath, '');
+  }
+
+  if (!fs.existsSync(accessTokenPath)) {
+    fs.writeFileSync(accessTokenPath, '');
+  }
+
+  const read_token_file = (type: string) => {
+    if (type !== 'r' && type !== 'a') {
+      return null;
+    }
+
+    const path = `${tokenPath}/${type}_token`;
+
+    if (!fs.existsSync(path)) {
+      return null;
+    }
+
+    const data = fs.readFileSync(path, { encoding: 'utf-8' });
+    const values = data.split('\n');
+
+    return {
+      token: values[0],
+      expires_at: values[1],
+    };
+  };
+
+  const read_token = (): AuthToken | null => {
+    const AccessToken = read_token_file('a');
+    const RefreshToken = read_token_file('r');
+
+    if (!AccessToken || !RefreshToken) {
+      return null;
+    }
+
+    return {
+      access_token: AccessToken.token,
+      refresh_token: RefreshToken.token,
+      expires_at: AccessToken.expires_at,
+      refresh_expires_at: RefreshToken.expires_at,
+    };
+  };
+
+  const write_token = (type: string, token: string, expires_at: string) => {
+    console.log('Writing token', type, token, expires_at);
+
+    if (type !== 'r' && type !== 'a') {
+      return;
+    }
+
+    const path = `${tokenPath}/${type}_token`;
+    fs.writeFile(path, `${token}\n${expires_at}`, 'utf-8', (err) => {
+      console.log(err);
+    });
+  };
+
+  const encrypt_token = (TokenData: any) => {
     const AccessToken = TokenData.access_token;
     const RefreshToken = TokenData.refresh_token;
 
@@ -52,41 +118,51 @@ export default (
     return null;
   };
 
-  const get_refresh_token = (TokenData: AuthToken) => {
-    const RefreshToken = TokenData.refresh_token;
-    const Expires = parseISOString(TokenData.refresh_expires_at as string);
-    const CurrentTime = Date.now();
-
-    if (CurrentTime >= Expires.getTime()) {
+  const decrypt_token = (TokenData: AuthToken | null): AuthToken | null => {
+    if (!TokenData) {
       return null;
     }
 
     if (safeStorage.isEncryptionAvailable()) {
       try {
-        const DecryptedToken = safeStorage.decryptString(
-          Buffer.from(RefreshToken as string, 'base64'),
+        const DecryptedAT = safeStorage.decryptString(
+          Buffer.from(TokenData.access_token as string, 'base64'),
         );
 
-        return DecryptedToken;
+        const DecryptedRT = safeStorage.decryptString(
+          Buffer.from(TokenData.refresh_token as string, 'base64'),
+        );
+
+        return {
+          access_token: DecryptedAT,
+          refresh_token: DecryptedRT,
+          expires_at: TokenData.expires_at,
+          refresh_expires_at: TokenData.refresh_expires_at,
+        };
       } catch {
         return null;
       }
-    } else {
-      return null;
     }
+
+    return null;
   };
 
-  ipc_main.on('encrypt-token', async (_, args) => {
+  ipc_main.on('encrypt-token', (_, args) => {
     const { TokenData } = args;
-    const EncryptedToken = await encrypt_token(TokenData);
+    const Encrypted = encrypt_token(TokenData.token);
 
-    if (EncryptedToken) {
-      settings.setSync('token', EncryptedToken);
+    if (Encrypted) {
+      write_token('a', Encrypted.access_token, Encrypted.expires_at);
+      write_token('r', Encrypted.refresh_token, Encrypted.refresh_expires_at);
     }
   });
 
-  ipc_main.on('get-refresh-token', async (event) => {
-    const TokenData = settings.getSync('token') as AuthToken;
+  ipc_main.on('get-refresh-token', (event) => {
+    let TokenData = read_token();
+    if (TokenData) {
+      TokenData = decrypt_token(TokenData);
+    }
+
     if (!TokenData) {
       event.reply('get-refresh-token-response', {
         error: 'Token not found',
@@ -96,8 +172,10 @@ export default (
       return;
     }
 
-    const RefreshToken = get_refresh_token(TokenData);
-    if (!RefreshToken) {
+    const Expires = parseISOString(TokenData.refresh_expires_at as string);
+    const CurrentTime = Date.now();
+
+    if (CurrentTime >= Expires.getTime()) {
       event.reply('get-refresh-token-response', {
         error: 'Token expired',
         token: null,
@@ -108,80 +186,52 @@ export default (
 
     event.reply('get-refresh-token-response', {
       error: null,
-      token: RefreshToken,
+      token: TokenData.refresh_token,
     });
   });
 
-  ipc_main.on('get-access-token', async (event) => {
-    let TokenData = settings.getSync('token') as AuthToken;
-    if (!TokenData) {
-      event.reply('get-access-token-response', {
-        error: 'Token not found',
-        token: null,
-      });
-      login(main_window);
-      return;
-    }
-
-    let AccessToken = TokenData.access_token;
-    const Expires = parseISOString(TokenData.expires_at as string);
-    const CurrentTime = Date.now();
-
-    if (CurrentTime >= Expires.getTime()) {
-      const RefreshToken = get_refresh_token(TokenData);
-      if (!RefreshToken) {
-        event.reply('get-access-token-response', {
-          error: 'Token expired and refresh failed',
-          token: null,
-        });
+  ipc_main.handle('get-access-token', async () => {
+    const do_refresh = async (token_data: AuthToken) => {
+      if (!token_data.refresh_token) {
         login(main_window);
-        return;
+        return null;
       }
 
-      TokenData = await refresh_token(RefreshToken);
-      AccessToken = TokenData.access_token;
+      const new_token_data = await refresh_token(token_data.refresh_token);
 
-      if (!AccessToken) {
-        event.reply('get-access-token-response', {
-          error: 'Token expired and refresh failed',
-          token: null,
-        });
+      if (!new_token_data || !new_token_data.access_token) {
         login(main_window);
-        return;
+        return null;
       }
 
-      event.reply('get-access-token-response', {
-        error: null,
-        token: AccessToken,
-      });
-
-      const EncryptedToken = await encrypt_token(TokenData);
-      if (EncryptedToken) {
-        settings.setSync('token', EncryptedToken);
+      const Encrypted = encrypt_token(new_token_data);
+      if (Encrypted) {
+        console.log('Writing token');
+        write_token('a', Encrypted.access_token, Encrypted.expires_at);
+        write_token('r', Encrypted.refresh_token, Encrypted.refresh_expires_at);
       }
+
+      return new_token_data.access_token;
+    };
+
+    const token_data = decrypt_token(read_token());
+    if (!token_data) {
+      return null;
     }
 
-    if (safeStorage.isEncryptionAvailable()) {
-      try {
-        const DecryptedToken = safeStorage.decryptString(
-          Buffer.from(AccessToken as string, 'base64'),
-        );
+    console.log(token_data);
 
-        event.reply('get-access-token-response', {
-          error: null,
-          token: DecryptedToken,
-        });
-      } catch {
-        event.reply('get-access-token-response', {
-          error: 'Failed to decrypt token',
-          token: null,
-        });
-      }
-    } else {
-      event.reply('get-access-token-response', {
-        error: 'Failed to decrypt token',
-        token: null,
-      });
+    if (!token_data.access_token) {
+      return do_refresh(token_data);
     }
+
+    const expires = parseISOString(token_data.expires_at as string);
+    const current_time = Date.now();
+
+    if (current_time >= expires.getTime()) {
+      return do_refresh(token_data);
+    }
+
+    return token_data.access_token;
   });
 };

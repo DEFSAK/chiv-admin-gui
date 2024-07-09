@@ -22,5 +22,9 @@
     "release/build",
     "release/app/dist",
     ".erb/dll"
-  ]
+  ],
+  "include": [
+    "src",
+    "clipboard-event.d.ts"
+  ],
 }
