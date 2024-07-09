@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Badges from './badges';
 
 interface RefreshFunction {
@@ -42,6 +42,7 @@ function Body({
   const [animatingRows, setAnimatingRows] = useState<Record<number, boolean>>(
     {},
   );
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
   const toggleRow = (index: number) => {
     if (expandedRows[index]) {
@@ -65,14 +66,23 @@ function Body({
         [index]: true,
       }));
     }
-    // setExpandedRows((prev) => ({
-    //   ...prev,
-    //   [index]: !prev[index],
-    // }));
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+  });
+
   return (
-    <div className="pt-body">
+    <div
+      className="pt-body"
+      style={{
+        maxHeight: windowHeight - 270,
+      }}
+    >
       {data.map((item, index) => (
         // eslint-disable-next-line react/no-array-index-key
         <div
