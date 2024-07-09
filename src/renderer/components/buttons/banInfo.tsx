@@ -11,10 +11,16 @@ export type BanInfoProps = {
 function BanInfo({ reason, duration, setReason, setDuration }: BanInfoProps) {
   const [showModal, setShowModal] = useState(false);
 
-  const handlePresetSelect = (banMsg: string, banTime: number) => {
-    setReason(banMsg);
-    setDuration(banTime);
+  const handlePresetSelect = (selectedPunishments: {
+    banMsg: string;
+    banTime: number;
+    banReasons: string;
+  }) => {
+    setReason(selectedPunishments.banMsg);
+    setDuration(selectedPunishments.banTime);
     setShowModal(false);
+
+    console.log(selectedPunishments);
   };
 
   return (

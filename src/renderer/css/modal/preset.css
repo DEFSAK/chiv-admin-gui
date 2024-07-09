@@ -91,3 +91,23 @@
 .preset-modal-item-name {
   font-weight: 700;
 }
+
+.preset-modal-item.selected {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.preset-modal-confirm-button {
+  width: 100%;
+  padding: 8px 16px;
+  background-color: #fff;
+  color: #000;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.preset-modal-confirm-button:hover {
+  background-color: #000;
+  color: #fff;
+}

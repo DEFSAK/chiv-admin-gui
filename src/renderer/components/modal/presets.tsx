@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useState } from 'react';
-
 import '../../css/modal/preset.css';
+import { toast } from 'react-toastify';
 
 const PresetPunishments: Record<
   string,
@@ -62,7 +62,7 @@ const PresetPunishments: Record<
   vk_abuse: {
     name: 'Votekick abuse',
     description:
-      'Using votekicks against trusted palyers or due to disagreements etc...',
+      'Using votekicks against trusted players or due to disagreements etc...',
     banMsg: 'Votekick abuse is not allowed',
     banTime: 24,
   },
@@ -85,10 +85,15 @@ function PresetModal({
   onSelect,
   setShowModal,
 }: {
-  onSelect: (banMsg: string, banTime: number) => void;
+  onSelect: (selectedPunishments: {
+    banMsg: string;
+    banTime: number;
+    banReasons: string;
+  }) => void;
   setShowModal: (showModal: boolean) => void;
 }) {
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const [selectedPunishments, setSelectedPunishments] = useState<string[]>([]);
 
   const handleClose = () => {
     setIsAnimatingOut(true);
@@ -96,6 +101,34 @@ function PresetModal({
       setShowModal(false);
       setIsAnimatingOut(false);
     }, 300);
+  };
+
+  const handleSelect = (key: string) => {
+    setSelectedPunishments((prev) =>
+      prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key],
+    );
+  };
+
+  const handleConfirm = () => {
+    if (selectedPunishments.length === 0) {
+      toast.error('Please select at least one preset');
+      return;
+    }
+
+    const selected = selectedPunishments.map((key) => PresetPunishments[key]);
+
+    const maxBanReason = selected.reduce((prev, current) => {
+      return prev.banTime > current.banTime ? prev : current;
+    });
+
+    const banReasons = selected.map((item) => item.name).join(',');
+
+    onSelect({
+      banMsg: maxBanReason.banMsg,
+      banTime: maxBanReason.banTime,
+      banReasons,
+    });
+    handleClose();
   };
 
   return (
@@ -106,10 +139,12 @@ function PresetModal({
         <div className="preset-modal-items">
           {Object.keys(PresetPunishments).map((key) => {
             const preset = PresetPunishments[key];
+            const isSelected = selectedPunishments.includes(key);
             return (
               <div
-                className="preset-modal-item"
-                onClick={() => onSelect(preset.banMsg, preset.banTime)}
+                key={key}
+                className={`preset-modal-item ${isSelected ? 'selected' : ''}`}
+                onClick={() => handleSelect(key)}
                 role="button"
                 tabIndex={0}
               >
@@ -121,6 +156,13 @@ function PresetModal({
             );
           })}
         </div>
+        <button
+          className="preset-modal-confirm-button"
+          type="button"
+          onClick={handleConfirm}
+        >
+          Confirm
+        </button>
         <button
           className="preset-modal-close-button"
           type="button"
