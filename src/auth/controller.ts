@@ -1,6 +1,7 @@
 import Express from 'express';
 import type { Server } from 'http';
 import { BrowserWindow, type IpcMain } from 'electron';
+import { jwtDecode } from 'jwt-decode';
 import {
   auth_code,
   get_login_url,
@@ -36,7 +37,18 @@ const login = (main_window: BrowserWindow) => {
 
     try {
       const token_data = await auth_code.getToken(token_params);
-      main_window.webContents.send('auth-user-success', token_data);
+
+      const { access_token } = token_data.token;
+      const decoded = jwtDecode(access_token as string) as {
+        [key: string]: any;
+        name: string;
+      };
+      console.log(decoded);
+
+      main_window.webContents.send('auth-user-success', {
+        token: token_data,
+        username: decoded.name,
+      });
       last_auth_state = true;
     } catch (error: any) {
       main_window.webContents.send('auth-user-fail', error.message);

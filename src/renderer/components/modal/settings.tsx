@@ -9,7 +9,6 @@ import '../../css/modal/settings.css';
 
 interface SettingsProps {
   username: string;
-  setUsername: (value: string) => void;
   consoleKey: IGlobalKeyEvent | undefined;
   setConsoleKey: (value: IGlobalKeyEvent) => void;
   keyActive: boolean;
@@ -27,7 +26,6 @@ const toast_settings = {
 
 function Tab1Content({
   username,
-  setUsername,
   consoleKey,
   setConsoleKey,
   keyActive,
@@ -38,11 +36,18 @@ function Tab1Content({
   useEffect(() => {
     window.electron.ipcRenderer.sendMessage('get-settings');
     window.electron.ipcRenderer.once('get-settings-response', (settings) => {
-      setUsername(settings.username as string);
       setConsoleKey(settings.consoleKey as IGlobalKeyEvent);
       setWebhook(settings.webhook as string);
     });
-  }, [setConsoleKey, setUsername, setWebhook]);
+
+    if (username.length > 0) {
+      window.electron.ipcRenderer.sendMessage('set-username', {
+        username,
+      });
+
+      console.log('Username set:', username);
+    }
+  }, [setConsoleKey, setWebhook, username]);
 
   const handleConsoleKey = (e: React.MouseEvent<HTMLButtonElement>) => {
     const Element = e.currentTarget;
@@ -61,25 +66,6 @@ function Tab1Content({
 
       Element.disabled = false;
     });
-  };
-
-  const handle_username_submit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const Element = e.currentTarget as HTMLInputElement;
-
-    if (e.key === 'Enter' && !keyActive) {
-      Element.classList.add('loading');
-
-      if (Element.value.length < 3) {
-        toast.error('Username must be at least 3 characters long.');
-      } else {
-        window.electron.ipcRenderer.sendMessage('set-username', {
-          username: Element.value,
-        });
-        toast.success('Username updated successfully!');
-      }
-
-      setKeyActive(true);
-    }
   };
 
   const handle_webhook_submit = async (
@@ -130,20 +116,6 @@ function Tab1Content({
     <div className="modal-settings-page">
       <input
         type="text"
-        placeholder="Change Username"
-        className="modal-settings-username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={handle_username_submit}
-        onKeyUp={(e) => {
-          if (e.key === 'Enter') {
-            e.currentTarget.classList.remove('loading');
-            setKeyActive(false);
-          }
-        }}
-      />
-      <input
-        type="text"
         placeholder="Change Webhook URL (Optional)"
         className="modal-settings-username"
         value={webhook}
@@ -187,6 +159,7 @@ export type SettingsModalProps = {
   onChangeTab: (tab: 'Settings' | 'Credits') => void;
   firstRun: boolean;
   setFirstRun: (value: boolean) => void;
+  tokenUsername: string;
 };
 
 function SettingsModal({
@@ -196,9 +169,9 @@ function SettingsModal({
   onChangeTab,
   firstRun,
   setFirstRun,
+  tokenUsername,
 }: SettingsModalProps) {
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
-  const [username, setUsername] = useState<string>('');
   const [consoleKey, setConsoleKey] = useState<IGlobalKeyEvent>();
   const [keyActive, setKeyActive] = useState(false);
   const [webhook, setWebhook] = useState<string>('');
@@ -215,11 +188,6 @@ function SettingsModal({
 
   const handleClose = () => {
     if (firstRun) {
-      if (!username) {
-        toast.error('Please enter a username.');
-        return;
-      }
-
       if (!consoleKey) {
         toast.error('Please set a console key.');
         return;
@@ -280,8 +248,7 @@ function SettingsModal({
         <div className="content">
           {activeTab === 'Settings' ? (
             <Tab1Content
-              username={username}
-              setUsername={setUsername}
+              username={tokenUsername}
               consoleKey={consoleKey}
               setConsoleKey={setConsoleKey}
               keyActive={keyActive}

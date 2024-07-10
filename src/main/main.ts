@@ -72,12 +72,9 @@ const create_window = () => {
   main_window.loadURL(resolveHtmlPath('index.html'));
 
   // Enforce required settings
-  const settings_keys = ['username', 'console'];
-  settings_keys.forEach((key) => {
-    if (!settings.hasSync(key)) {
-      first_run = true;
-    }
-  });
+  if (!settings.hasSync('console')) {
+    first_run = true;
+  }
 
   main_window.setMenuBarVisibility(true);
 

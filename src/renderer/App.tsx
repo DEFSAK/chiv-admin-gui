@@ -8,17 +8,17 @@ import GlassTable, { type RefreshFunction } from './components/main/table';
 import GlassTableControls from './components/main/controls';
 import GlassTableMisc from './components/main/extra';
 
-window.electron.ipcRenderer.on('auth-user-success', (TokenData) => {
-  console.log('OAuth Success', TokenData);
+// window.electron.ipcRenderer.on('auth-user-success', (args) => {
+//   console.log('OAuth Success', args.token);
 
-  window.electron.ipcRenderer.sendMessage('encrypt-token', {
-    TokenData,
-  });
-});
+//   window.electron.ipcRenderer.sendMessage('encrypt-token', {
+//     TokenData: args.token,
+//   });
+// });
 
-window.electron.ipcRenderer.on('auth-user-fail', (error) => {
-  console.log('OAuth Fail:', error);
-});
+// window.electron.ipcRenderer.on('auth-user-fail', (error) => {
+//   console.log('OAuth Fail:', error);
+// });
 
 function Home() {
   const [refreshData, setRefreshData] = useState({});
@@ -27,6 +27,7 @@ function Home() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Settings');
   const [firstRun, setFirstRun] = useState(false);
+  const [username, setUsername] = useState('');
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
@@ -34,6 +35,19 @@ function Home() {
   const handleRefresh = (
     newData: RefreshFunction[] | Record<string, string>[],
   ) => setRefreshData(newData);
+
+  window.electron.ipcRenderer.on('auth-user-success', (args) => {
+    console.log('OAuth Success', args.token);
+    setUsername(args.username as string);
+
+    window.electron.ipcRenderer.sendMessage('encrypt-token', {
+      TokenData: args.token,
+    });
+  });
+
+  window.electron.ipcRenderer.on('auth-user-fail', (error) => {
+    console.log('OAuth Fail:', error);
+  });
 
   window.electron.ipcRenderer.on('first-run', () => {
     setFirstRun(true);
@@ -74,6 +88,7 @@ function Home() {
         onChangeTab={handleChangeTab}
         firstRun={firstRun}
         setFirstRun={setFirstRun}
+        tokenUsername={username}
       />
     </div>
   );
