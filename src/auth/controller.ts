@@ -107,7 +107,11 @@ export default (ipc_main: IpcMain, main_window: BrowserWindow) => {
   });
 
   ipc_main.handle('get-players', async (_, args) => {
-    const players = await get_validated_players(args.token, args.players);
+    const players = await get_validated_players(
+      args.token,
+      args.server,
+      args.players,
+    );
     return players || null;
   });
 

@@ -47,6 +47,7 @@ export interface Args {
   webhook?: string;
   players?: Record<string, string>[];
   clipboard?: string;
+  server?: string;
 }
 
 const electronHandler = {

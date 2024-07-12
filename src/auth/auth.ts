@@ -82,6 +82,7 @@ export const refresh_token = async (token: string) => {
 export const get_validated_players = async (
   token: string,
   players: Record<string, string>[],
+  server: string,
 ) => {
   const response = await axios.post(
     'https://apim-chivvy.azure-api.net/rpc',
@@ -89,6 +90,7 @@ export const get_validated_players = async (
       jsonrpc: '2.0',
       method: 'Validator.Validate',
       params: {
+        server_name: server,
         players,
       },
       id: 1,

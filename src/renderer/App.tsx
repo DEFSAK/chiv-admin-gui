@@ -8,18 +8,6 @@ import GlassTable, { type RefreshFunction } from './components/main/table';
 import GlassTableControls from './components/main/controls';
 import GlassTableMisc from './components/main/extra';
 
-// window.electron.ipcRenderer.on('auth-user-success', (args) => {
-//   console.log('OAuth Success', args.token);
-
-//   window.electron.ipcRenderer.sendMessage('encrypt-token', {
-//     TokenData: args.token,
-//   });
-// });
-
-// window.electron.ipcRenderer.on('auth-user-fail', (error) => {
-//   console.log('OAuth Fail:', error);
-// });
-
 function Home() {
   const [refreshData, setRefreshData] = useState({});
   const [reason, setReason] = useState('');

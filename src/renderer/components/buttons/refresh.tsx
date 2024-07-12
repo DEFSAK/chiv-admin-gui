@@ -45,7 +45,7 @@ const parsePlayerData = (text: string) => {
 };
 
 const get_players = async (text: string, callback: (data: any) => void) => {
-  const { parsedData } = parsePlayerData(text);
+  const { serverName, parsedData } = parsePlayerData(text);
   const access_token = await ipcRenderer.invoke('get-access-token');
 
   if (!access_token) {
@@ -54,6 +54,7 @@ const get_players = async (text: string, callback: (data: any) => void) => {
   }
 
   const players = await ipcRenderer.invoke('get-players', {
+    server: serverName,
     players: parsedData,
     token: access_token,
   });
