@@ -103,7 +103,6 @@ const process_command_queue = async (main_window: BrowserWindow) => {
     let has_changed = false;
     clipboardListener.startListening();
     clipboardListener.on('change', () => {
-      console.log('Clipboard changed');
       const clip = clipboard.readText();
       if (!clip.includes('listplayers')) {
         has_changed = true;

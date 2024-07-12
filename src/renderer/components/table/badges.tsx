@@ -14,7 +14,9 @@ export default function Badges({ trustInfo }: BadgeProps) {
     <div className="badges">
       {trustInfo.is_admin && <span className="badge admin" />}
       {trustInfo.is_veteran && <span className="badge veteran" />}
-      {trustInfo.is_suspicious && <span className="badge suspicious" />}
+      {(trustInfo.is_suspicious || trustInfo.was_banned) && (
+        <span className="badge suspicious" />
+      )}
     </div>
   );
 }
