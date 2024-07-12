@@ -1,6 +1,7 @@
 import path from 'path';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import settings from 'electron-settings';
+import { autoUpdater } from 'electron-updater';
 import { resolveHtmlPath } from './util';
 import auth_controller from '../auth/controller';
 import command_ipc from './ipc/command';
@@ -11,40 +12,7 @@ import token_ipc from './ipc/token';
 let main_window: BrowserWindow | null;
 let first_run = false;
 
-// #region Debug Tooling (might remove)
-// if (process.env.NODE_ENV === 'production') {
-//   const sourceMapSupport = require('source-map-support');
-//   sourceMapSupport.install();
-// }
-
-// const isDebug =
-//   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-
-// if (isDebug) {
-//   require('electron-debug')();
-// }
-
-// const installExtensions = async () => {
-//   const installer = require('electron-devtools-installer');
-//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-//   const extensions = ['REACT_DEVELOPER_TOOLS'];
-
-//   return installer
-//     .default(
-//       extensions.map((name) => installer[name]),
-//       forceDownload,
-//     )
-//     .catch(console.log);
-// };
-// #endregion
-
 const create_window = () => {
-  /*
-  if (isDebug) {
-    await installExtensions();
-  }
-  */
-
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -67,8 +35,7 @@ const create_window = () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
-
-  main_window.setTitle('Admin GooWee');
+  main_window.setTitle('Admin GooWee 4.7.0');
   main_window.loadURL(resolveHtmlPath('index.html'));
 
   // Enforce required settings
@@ -119,4 +86,6 @@ app.on('ready', () => {
   app.on('activate', () => {
     if (main_window === null) create_window();
   });
+
+  autoUpdater.checkForUpdatesAndNotify();
 });
