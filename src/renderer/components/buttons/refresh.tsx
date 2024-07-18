@@ -150,24 +150,6 @@ function Refresh({ onRefresh }: RefreshProps) {
                   ...toast_args,
                 });
 
-                data.sort((a: any, b: any) => {
-                  if (a.trust_info.is_suspicious) {
-                    return -1;
-                  }
-                  if (b.trust_info.is_suspicious) {
-                    return 1;
-                  }
-
-                  if (a.trust_info.was_banned) {
-                    return -1;
-                  }
-                  if (b.trust_info.was_banned) {
-                    return 1;
-                  }
-
-                  return 0;
-                });
-
                 onRefresh(data);
               });
             }

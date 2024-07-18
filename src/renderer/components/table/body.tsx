@@ -17,9 +17,9 @@ interface RefreshFunction {
     is_suspicious: boolean;
     is_new_to_db: boolean;
     was_banned: boolean;
-    ban_charges: null | string[];
-    ban_command: string;
-    kick_command: string;
+    ban_charges?: null | string[];
+    ban_command?: string;
+    kick_command?: string;
   };
 }
 
@@ -75,6 +75,10 @@ function Body({
 
     window.addEventListener('resize', handleResize);
   });
+
+  useEffect(() => {
+    console.log('data changed');
+  }, [data]);
 
   return (
     <div

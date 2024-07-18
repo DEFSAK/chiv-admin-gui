@@ -18,13 +18,14 @@ export interface RefreshFunction {
     is_suspicious: boolean;
     is_new_to_db: boolean;
     was_banned: boolean;
-    ban_charges: null | string[];
-    ban_command: string;
-    kick_command: string;
+    ban_charges?: null | string[];
+    ban_command?: string;
+    kick_command?: string;
   };
 }
 
 export interface TableData {
+  setData: (data: RefreshFunction[]) => void;
   data: RefreshFunction[];
   reason: string;
   duration: number;
@@ -52,7 +53,7 @@ const run_command = (command: string, param: string, toastId: Id) => {
   });
 };
 
-function GlassTable({ data, reason, duration }: TableData) {
+function GlassTable({ data, reason, duration, setData }: TableData) {
   const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>(
     {},
   );
@@ -169,6 +170,8 @@ function GlassTable({ data, reason, duration }: TableData) {
         toggleAll={toggleAll}
         setSearchTerm={setSearchTerm}
         filteredData={filteredData}
+        rawData={data}
+        setData={setData}
       />
       <GlassTableBody
         data={filteredData}

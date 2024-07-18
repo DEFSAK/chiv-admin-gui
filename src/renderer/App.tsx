@@ -20,9 +20,7 @@ function Home() {
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
   const handleChangeTab = (tab: string) => setActiveTab(tab);
-  const handleRefresh = (
-    newData: RefreshFunction[] | Record<string, string>[],
-  ) => setRefreshData(newData);
+  const handleRefresh = (newData: RefreshFunction[]) => setRefreshData(newData);
 
   window.electron.ipcRenderer.on('auth-user-success', (args) => {
     console.log('OAuth Success', args.token);
@@ -55,6 +53,7 @@ function Home() {
         setDuration={setDuration}
       />
       <GlassTable
+        setData={setRefreshData}
         data={Object.values(refreshData)}
         reason={reason}
         duration={duration}
