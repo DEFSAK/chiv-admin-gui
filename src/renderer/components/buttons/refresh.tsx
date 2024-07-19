@@ -108,7 +108,8 @@ function Refresh({ onRefresh }: RefreshProps) {
             command: 'listplayers',
           });
           window.electron.ipcRenderer.once('command-response', async (args) => {
-            console.log(`Got response: ${args}`);
+            console.log('THIS IS IMPORTANT');
+            console.log(args);
             if (args.error) {
               toast.update(id, {
                 render: args.error,

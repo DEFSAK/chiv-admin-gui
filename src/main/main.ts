@@ -12,6 +12,10 @@ import token_ipc from './ipc/token';
 let main_window: BrowserWindow | null;
 let first_run = false;
 
+autoUpdater.logger = require('electron-log');
+
+autoUpdater.logger.transports.file.level = 'info';
+
 const create_window = () => {
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -35,7 +39,7 @@ const create_window = () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
-  main_window.setTitle('Admin GooWee 4.7.0');
+  main_window.setTitle('Admin GooWee 4.8.5');
   main_window.loadURL(resolveHtmlPath('index.html'));
 
   // Enforce required settings

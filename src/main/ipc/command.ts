@@ -11,7 +11,7 @@ import {
   type Mouse,
   type Workwindow,
 } from 'keysender';
-import clipboardListener from 'clipboard-event';
+// import clipboardListener from 'clipboard-event';
 
 // Because the Worker class in keysender from worker.d.ts file is not exported, we have to redefine it, in this case as the Game class
 declare class Game {
@@ -100,31 +100,57 @@ const process_command_queue = async (main_window: BrowserWindow) => {
   }
 
   if (args.commandName === 'listplayers') {
+    let clipboard_content = 'listplayers';
     let has_changed = false;
-    clipboardListener.startListening();
-    clipboardListener.on('change', () => {
-      const clip = clipboard.readText();
-      if (!clip.includes('listplayers')) {
+
+    const clipboardListener = () => {
+      const new_clipboard_content = clipboard.readText();
+      if (new_clipboard_content !== clipboard_content) {
+        clipboard_content = new_clipboard_content;
         has_changed = true;
+      }
+
+      if (!has_changed) {
+        setTimeout(clipboardListener, 100);
+      }
+
+      if (has_changed) {
         event.reply('command-response', {
           command: args.commandName,
-          clipboard: clip,
+          clipboard: clipboard_content,
           toast: args.toast,
         });
-        clipboardListener.stopListening();
       }
-    });
+    };
 
-    setTimeout(() => {
-      console.log(has_changed);
-      if (!has_changed) {
-        event.reply('command-response', {
-          command: args.commandName,
-          error: 'No response from game',
-        });
-        clipboardListener.stopListening();
-      }
-    }, 2000);
+    clipboardListener();
+
+    // let has_changed = false;
+
+    // clipboardListener.startListening();
+    // clipboardListener.on('change', () => {
+    //   const clip = clipboard.readText();
+    //   if (!clip.includes('listplayers')) {
+    //     has_changed = true;
+    //     event.reply('command-response', {
+    //       command: args.commandName,
+    //       clipboard: clip,
+    //       toast: args.toast,
+    //     });
+    //     clipboardListener.stopListening();
+    //   }
+    // });
+
+    // setTimeout(() => {
+    //   console.log(has_changed);
+    //   if (!has_changed) {
+    //     event.reply('command-response', {
+    //       command: args.commandName,
+    //       error: 'No response from game',
+    //     });
+    //     clipboardListener.stopListening();
+    //   }
+    // }, 10000);
   }
 
   await write_to_console(game, args.command);

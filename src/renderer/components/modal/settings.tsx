@@ -7,6 +7,8 @@ import axios from 'axios';
 
 import '../../css/modal/settings.css';
 
+const { ipcRenderer } = window.electron;
+
 interface SettingsProps {
   username: string;
   consoleKey: IGlobalKeyEvent | undefined;
@@ -152,11 +154,69 @@ function Tab2Content() {
   );
 }
 
+function Tab3Content() {
+  const [username, setUsername] = useState('');
+  const [playfabID, setPlayfabID] = useState('');
+
+  const handleValidation = async () => {
+    if (playfabID.length < 1) {
+      toast.error('PlayFabPlayerID is required.');
+      return;
+    }
+
+    const access_token = await ipcRenderer.invoke('get-access-token');
+
+    if (!access_token) {
+      toast.error('Failed to get access token.');
+      return;
+    }
+
+    const players = await ipcRenderer.invoke('get-players', {
+      server: '',
+      players: [{ display_name: username, playfab_id: playfabID }],
+      token: access_token,
+    });
+
+    if (players.length < 1) {
+      toast.error('No players were found.');
+      return;
+    }
+
+    console.log(players);
+  };
+
+  return (
+    <div className="modal-validation-tab">
+      <input
+        type="text"
+        placeholder="Enter Username (Optional but recommended)"
+        className="modal-validation-username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Enter PlayfabPlayerID (Required)"
+        className="modal-validation-id"
+        value={playfabID}
+        onChange={(e) => setPlayfabID(e.target.value)}
+      />
+      <button
+        className="modal-validation-button"
+        type="button"
+        onClick={handleValidation}
+      >
+        Validate
+      </button>
+    </div>
+  );
+}
+
 export type SettingsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   activeTab: string;
-  onChangeTab: (tab: 'Settings' | 'Credits') => void;
+  onChangeTab: (tab: 'Settings' | 'Credits' | 'Validation') => void;
   firstRun: boolean;
   setFirstRun: (value: boolean) => void;
   tokenUsername: string;
@@ -224,6 +284,15 @@ function SettingsModal({
           >
             Credits
           </button>
+          <button
+            type="button"
+            className={`modal-tab-button ${
+              activeTab === 'Validation' ? 'active' : ''
+            }`}
+            onClick={() => onChangeTab('Validation')}
+          >
+            Validation
+          </button>
 
           <button
             className="modal-close-button"
@@ -246,6 +315,7 @@ function SettingsModal({
           </button>
         </div>
         <div className="content">
+          {/* eslint-disable-next-line no-nested-ternary */}
           {activeTab === 'Settings' ? (
             <Tab1Content
               username={tokenUsername}
@@ -256,8 +326,10 @@ function SettingsModal({
               webhook={webhook}
               setWebhook={setWebhook}
             />
-          ) : (
+          ) : activeTab === 'Credits' ? (
             <Tab2Content />
+          ) : (
+            <Tab3Content />
           )}
         </div>
       </div>
